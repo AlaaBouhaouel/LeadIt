@@ -170,37 +170,6 @@ A curated catalogue of real Tunisian entrepreneurship support resources, structu
 
 ---
 
-## Project Structure
-
-```
-LeadIt/
-├── README.md                   ← this file
-├── docs/
-│   ├── concept_deck.pptx       ← first-submission presentation
-│   ├── scoring_methodology.md  ← criteria, weights, aggregation (in progress)
-│   └── architecture.md         ← system design & data flow
-├── taxonomy/
-│   └── taxonomy.py             ← maturity stage criteria model (built)
-├── knowledge_base/
-│   └── base_connaissances.xlsx  ← KB spreadsheet (23 entries)
-├── backend/                    ← FastAPI app (coming)
-│   ├── agents/
-│   │   ├── diagnostic.py
-│   │   ├── scoring/
-│   │   │   ├── market.py
-│   │   │   ├── commercial.py
-│   │   │   ├── innovation.py
-│   │   │   ├── scalability.py
-│   │   │   └── green.py
-│   │   ├── gap_analyzer.py
-│   │   └── roadmap.py
-│   ├── profile/
-│   │   └── models.py
-│   └── rag/
-│       └── retriever.py
-├── frontend/                   ← Next.js app (coming)
-└── evaluation/                 ← test set & metrics (coming)
-```
 
 ---
 
@@ -234,20 +203,6 @@ The test protocol and results will be documented in `evaluation/`.
 | ⬜ | Evaluate on a labelled test set |
 
 ---
-
-## How to Run
-
-> Setup instructions will be added once the backend and frontend are functional. The current submission is a concept and prototype foundation — the taxonomy criteria model (`taxonomy.py`) and the knowledge base spreadsheet are the working artefacts.
-
-```bash
-# (coming — not yet runnable)
-git clone https://github.com/<your-org>/LeadIt.git
-cd LeadIt
-# backend
-cd backend && pip install -r requirements.txt && uvicorn main:app --reload
-# frontend
-cd frontend && npm install && npm run dev
-```
 
 ---
 
