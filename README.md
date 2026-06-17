@@ -1,168 +1,270 @@
-# LeadIt — AI Orientation Platform for Tunisian Entrepreneurs
+# LeadIt
 
-> **Diagnostic, score et feuille de route pour l'entrepreneur tunisien.**  
-> *Know where your project stands. Understand why. Know what to do next.*
+**Intelligent Entrepreneurial Orientation Engine**
+
+LeadIt is an AI orientation platform that tells a Tunisian entrepreneur where their project actually stands, why, and what to do next. It runs an adaptive diagnostic that classifies project maturity and flags the gap between self-perception and reality, scores the project across five explainable dimensions, and generates a personalised roadmap grounded in real Tunisian support programs and financing devices. Every output is traceable — to a criterion, a score breakdown, or a real source.
+
+> AINS Hackathon 2026 · AI for Entrepreneurship
+> First Submission — Concept & Prototype Foundation
+
+---
+
+## Team
+
+**Tey bel Bondo9**
+
+| Member | Role |
+|---|---|
+| Ala Bouhaouel | Technical conception & system design |
+| Amin Hmida | Taxonomy criteria model |
+| Adem Gaddour | Knowledge base construction |
+| Ahmed Ellouze | Product & integration |
 
 ---
 
 ## The Problem
 
-Tunisia produces over 100,000 university graduates every year. A growing share turn to entrepreneurship — not always by choice, but because the formal job market leaves them without a path. They arrive with degrees, ideas, and motivation, but almost no structured way to know whether their project is ready, what's missing, and where to go next.
+Entrepreneurs at the early and growth stages in Tunisia face compounding orientation failures. They misjudge their own maturity — a founder who believes they are financing-ready may have no validated business model. The information that exists is fragmented, generic, and never contextualised to a specific project profile. Existing tools answer questions but do not diagnose; they provide information but do not produce a structured, evidence-based assessment of where a project actually stands and what it actually needs.
 
-The result is a predictable failure pattern: a graduate overestimates their readiness, applies to a financing program they aren't eligible for, gets rejected without explanation, and exits the ecosystem — sometimes permanently. **The gap isn't talent. It's orientation.**
+The result is misaligned orientation: entrepreneurs are sent to programs they don't qualify for, offered resources that don't match their real stage, and left without a clear picture of what is genuinely blocking their progress.
 
-Existing support structures (ANETI, BTS, incubators) are fragmented, Tunis-centric, and reactive. A first-time founder in Gafsa or Sidi Bouzid has no reliable way to self-assess before showing up to an institution and being told they're not ready.
+## The Solution
 
----
+LeadIt is a multi-agent AI platform built around three mandatory, interacting engines:
 
-## Who This Is For
+**1. Diagnose** — An adaptive diagnostic engine classifies the project into one of six maturity stages using factual, evidence-linked criteria. It detects the gap between the entrepreneur's self-assessed stage and the system's classification, and surfaces priority blockers.
 
-**Primary user:** A recent graduate — typically 22 to 30, holding a Licence or Master's, located anywhere in Tunisia — who has a project idea at some stage between concept and early validation. They are likely applying to public support programs for the first time, likely underestimating their structuration gaps, and likely without a mentor or ecosystem contact who can give them honest, calibrated feedback.
+**2. Score** — An explainable scoring engine evaluates the project across five composite dimensions (Market, Commercial Offer, Innovation, Scalability, Green), each decomposed into weighted sub-criteria with plain-language justification. Anomalies and inconsistencies are flagged.
 
-This is not a niche. ANETI alone processes tens of thousands of dossiers annually. The *diplômé-chômeur* entrepreneur is the modal user of Tunisian public startup support — and the one most consistently failed by it.
+**3. Guide** — A RAG-grounded roadmap engine retrieves relevant resources from a curated knowledge base of real Tunisian support programs, financing devices, and administrative procedures, and generates a personalised, ordered action plan. Every recommendation cites its source.
 
-**Secondary user:** Support-program officers at institutions like APII and ANETI who triage applicants and need a structured, explainable basis for orientation decisions.
-
----
-
-## What LeadIt Does
-
-LeadIt runs an adaptive diagnostic on a founder's project. It surfaces the gap between self-perception and actual readiness, scores the project across five explainable dimensions, and generates a prioritized roadmap pointing to real Tunisian programs and financing devices matched to the project's actual profile.
-
-Every output is traceable — to a criterion, a score breakdown, or a real KB source. No black box. No vague encouragement.
+The integration is the differentiator: a diagnostic gap triggers resource retrieval; a low sub-score surfaces targeted roadmap actions. The three engines interact through a shared project profile — they don't just coexist as independent panels.
 
 ---
 
-## Architecture
+## Target Users
+
+**Primary:** Young Tunisian founders and unemployed graduates exploring entrepreneurship as a career path — need an objective assessment of project maturity, readiness, and the concrete next steps required to grow.
+
+**Secondary:** Support-program officers (APII, ANETI, incubators) who triage and orient applicants with evidence-based diagnosis instead of self-reported claims; ecosystem actors and investors who need a consistent, explainable scoring lens to compare projects.
+
+---
+
+## System Architecture
+
+### Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js + Tailwind CSS |
+| Backend | FastAPI (Python) |
+| Orchestration | LangGraph |
+| LLM | Qwen / Llama (open-source) |
+| Database | PostgreSQL |
+| Vector DB | Qdrant |
+| RAG | LangChain |
+
+### Multi-Agent Pipeline
 
 ```
-Founder Input
-      ↓
-Profile Builder
-      ↓
-Shared Project Profile
-      ↓
-Diagnostic Agent          ← Classifies maturity stage + detects perception gap
-      ↓
-5 Parallel Scoring Agents
-  ├── Market Understanding
-  ├── Commercial Viability
-  ├── Innovation & Differentiation
-  ├── Scalability
-  └── Green / Sustainability Score
-      ↓
-Gap Analyzer              ← Identifies weaknesses and structural blockers
-      ↓
-Roadmap Agent             ← Matches project to Tunisian programs & resources
-      ↓
-Explainable Report
+User Input
+    ↓
+Profile Builder (adaptive intake, branching questionnaire)
+    ↓
+Shared Project Profile (PostgreSQL, persisted across sessions)
+    ↓
+Diagnostic Agent (rule-based classifier → stage + perception gap + blockers)
+    ↓
+┌──────────┬──────────────┬────────────┬──────────────┬─────────┐
+│  Market  │  Commercial  │ Innovation │ Scalability  │  Green  │
+│  Agent   │    Agent     │   Agent    │    Agent     │  Agent  │
+└──────────┴──────────────┴────────────┴──────────────┴─────────┘
+    ↓
+Gap Analyzer + Rule Engine
+    ↓
+Roadmap Agent  ←── Tunisian Knowledge Base (Qdrant)
+    ↓
+Explainable Report (dashboard + Mon Parcours tracking view)
+    ↓
+Grounded Conversational Assistant (thin LLM layer, not the core product)
 ```
 
-**Key design principles:**
+### Why Multi-Agent
 
-- All agents work on the **same shared project profile** — no information loss between stages
-- The **Diagnostic** tells us *where the project is* (maturity stage)
-- The **Scoring layer** tells us *how strong it is* (five independent dimensions)
-- The **Gap Analyzer** tells us *what is missing* (weaknesses and blockers)
-- The **Roadmap** tells us *what to do next* (matched, real resources)
-- Every result is **traceable** to evidence, rules, or KB sources
+Each agent has a single responsibility, making outputs explainable and traceable to specific rules or criteria. The five scoring agents run in parallel to reduce latency. The architecture maps directly to the hackathon's evaluation dimensions and is designed to extend (new scoring dimensions, new KB sources) without restructuring the pipeline.
 
 ---
 
-## The Five Scoring Dimensions
+## Taxonomy Criteria Model
 
-| Dimension | What It Measures |
-|-----------|-----------------|
-| **Market Understanding** | Does the founder know who their customer is, what the market size looks like, and whether demand has been validated? |
-| **Commercial Viability** | Is there a credible revenue model? Are unit economics understood? Is the pricing defensible? |
-| **Innovation & Differentiation** | What makes this project distinct? Is there a moat — IP, process, network effect, or unique positioning? |
-| **Scalability** | Can this grow beyond the founder? Is the model replicable across geographies or segments? |
-| **Green Score** | Does the project align with sustainability criteria relevant to Tunisian green economy programs (GEWEET, Think Green, GGJAP)? |
+**Status: Built** (`taxonomy.py`)
 
-Each dimension is scored with an explanation tied to the founder's responses — not a black-box number.
+Six ordered maturity stages. A project sits at the highest stage whose factual criteria all pass. Each criterion is a function that returns one of three values:
+
+| Return | Meaning |
+|---|---|
+| `True` | Criterion satisfied |
+| `False` | Not satisfied — a real, identified gap |
+| `None` | Data missing — surfaced as uncertainty, not hidden as failure |
+
+This three-way separation is what allows the system to handle incomplete profiles gracefully and signal ambiguity rather than mask it.
+
+### Stage criteria
+
+| Stage | Criteria |
+|---|---|
+| 1 · Ideation | Default entry — no criteria required |
+| 2 · Market Validation | `has_validated_problem` (interviews, pre-orders, or pilot) |
+| 3 · Structuration | `business_model_documented` · `team_core_complete` · `legal_form_started` |
+| 4 · Fundraising | `has_paying_customers` · `financial_docs_exist` · `legal_form_registered` |
+| 5 · Launch Planning | `funding_or_self_financing` · `distribution_channel_tested` |
+| 6 · Growth | `recurring_revenue` (3+ consecutive months) · `client_base_beyond_pilot` |
+
+Each criterion is tagged with a blocker domain (`financier`, `legal`, `marche`, `organisationnel`, `technique`) to enable cross-module integration: a gap detected by the diagnostic feeds directly into the KB retrieval filter for the roadmap engine.
+
+### Open decision
+
+The rule for `None` propagation is still being finalised: when a higher-stage criterion returns `None` (missing data rather than failure), should the project be blocked at the prior stage or held at a provisional classification pending further information? This is the key design question for the "handles ambiguity gracefully" acceptance criterion.
 
 ---
 
-## Perception Gap Detection
+## Scoring Dimensions
 
-A core feature of the diagnostic is the **perception gap**: the distance between how ready a founder *thinks* they are and how ready they *actually* are based on their responses. First-time founders — particularly diplômés-chômeurs — systematically overestimate financial readiness and underestimate structuration requirements.
+**Status: In progress**
 
-LeadIt surfaces this gap explicitly, not as a rejection, but as a calibration: *here is what you said, here is what your answers show, here is the delta*.
+Five composite scores, each decomposing into weighted sub-criteria:
 
----
+| Score | Sub-dimensions |
+|---|---|
+| Market | Market share · customer validation · revenue model viability |
+| Commercial Offer | Value-prop clarity · product readiness · pricing · offer-need fit |
+| Innovation | Local novelty · tech intensity · barrier to entry · departure from existing offerings |
+| Scalability | Replicability · manual dependency · deployment cost · addressable reach |
+| Green | Environmental impact · SDG alignment · resource efficiency · circular economy |
 
-## Project Maturity Stages
-
-The Diagnostic Agent classifies each project into one of six stages:
-
-| Stage | Description |
-|-------|-------------|
-| **1. Idéation** | The idea exists but hasn't been validated |
-| **2. Validation marché** | Real customer tests underway, MVP in progress |
-| **3. Structuration** | Business model defined, legal creation in progress |
-| **4. Levée de fonds** | Seeking external financing |
-| **5. Lancement** | Product or service live on the market |
-| **6. Croissance** | Scaling, expansion, internationalisation |
-
-Roadmap recommendations are always stage-appropriate. A project at Idéation is not recommended a BFPME credit application.
+Weights and aggregation logic are being defined. Composite scores will not be simple averages — a weak score on a fundamental dimension must not be masked by strong scores elsewhere.
 
 ---
 
 ## Knowledge Base
 
-LeadIt's Roadmap Agent draws on a curated knowledge base of **23 verified Tunisian programs and institutions**, covering:
+**Status: In construction** — 23 entries structured, target ≥ 30
 
-- **Accompaniment:** APII Pépinières, APII Think Green (PNUD), ANPE, Flat6Labs Tunis, Wiki Startup, ODC Orange
-- **Financing:** BFPME (credit + zero-interest startup lines), BTS microcredit, Startup Act Fonds de fonds, UNDP programs, AFD facility, AMC microfinance associations
-- **Administrative:** RNE registration, APII guichet unique, CEPEX export support, Startup Act label
-- **Ecosystem:** CONECT, IEEE Tunisia, AINS 4.0
-- **Validation:** APII Concours National de l'Invention
+A curated catalogue of real Tunisian entrepreneurship support resources, structured for retrieval. Each entry includes: name, provider, category, description, eligibility, amount/terms, applicable maturity stage, how to apply, and source URL.
 
-Each KB entry includes eligibility criteria, compatible project stages, priority sectors, expected benefit, and application pathway. Recommendations are matched against the project profile — not served as a generic list.
+### Categories covered
 
----
+| Category | Institutions |
+|---|---|
+| Support & accompaniment | APII pépinières, ANPE, ODC, incubators |
+| Financing | BFPME, BTS, Startup Act funds, Flat6Labs |
+| Administrative & regulatory | Startup Label, RNE, guichet unique, CEPEX |
+| Ecosystem actors | CONECT, IEEE, Wiki Startup, AINS 4.0 |
 
-## Explainability Commitment
+### Remaining work
 
-Every output LeadIt produces is grounded:
-
-- **Scores** link back to specific diagnostic questions and the criteria applied
-- **Gap flags** explain *why* something is identified as a weakness, not just *that* it is
-- **Roadmap entries** specify which KB source was matched, on what basis, and what the application pathway is
-- **Perception gap** shows the delta between self-reported and response-implied readiness, dimension by dimension
-
-This is intentional. Founders who receive a score without explanation cannot act on it. Institutions that receive a recommendation without traceable reasoning cannot trust it.
+- Reach 30+ entries with verified source URLs on every row
+- Re-verify financial amounts against official sources (BTS ceilings, BFPME rates)
+- Add a `gap_domain` column to enable join with the diagnostic engine's blocker detection
+- Cover the Technical blocker domain (technopoles, R&D, tech-transfer programmes)
 
 ---
 
-## Tech Stack
+## Project Structure
 
-| Layer | Technology |
-|-------|-----------|
-| Multi-agent orchestration | Claude API (Anthropic) — multi-agent pipeline |
-| Knowledge base | Structured JSON/XLSX — 23 Tunisian programs |
-| Frontend | React / Next.js |
-| Backend | Node.js / Python |
-| Deployment | TBD |
+```
+LeadIt/
+├── README.md                   ← this file
+├── docs/
+│   ├── concept_deck.pptx       ← first-submission presentation
+│   ├── scoring_methodology.md  ← criteria, weights, aggregation (in progress)
+│   └── architecture.md         ← system design & data flow
+├── taxonomy/
+│   └── taxonomy.py             ← maturity stage criteria model (built)
+├── knowledge_base/
+│   └── base_connaissances.xlsx  ← KB spreadsheet (23 entries)
+├── backend/                    ← FastAPI app (coming)
+│   ├── agents/
+│   │   ├── diagnostic.py
+│   │   ├── scoring/
+│   │   │   ├── market.py
+│   │   │   ├── commercial.py
+│   │   │   ├── innovation.py
+│   │   │   ├── scalability.py
+│   │   │   └── green.py
+│   │   ├── gap_analyzer.py
+│   │   └── roadmap.py
+│   ├── profile/
+│   │   └── models.py
+│   └── rag/
+│       └── retriever.py
+├── frontend/                   ← Next.js app (coming)
+└── evaluation/                 ← test set & metrics (coming)
+```
 
 ---
 
-## Status
+## Evaluation Plan
 
-This project was developed in the context of the **AIESEC x PNUD / GEWEET hackathon**. The knowledge base, diagnostic logic, scoring rubrics, and agent architecture are defined. Implementation is in progress.
+**Status: Planned**
+
+At least one measurable metric will be defined and run on a labelled test set before the final submission:
+
+- **Classification accuracy** — a small labelled set of synthetic entrepreneur profiles with ground-truth maturity stages, scored against the diagnostic engine's output.
+- **Retrieval relevance** — for a given diagnostic output, do the top-K KB results match the identified gaps and stage? Measured by precision@K on a hand-labelled evaluation set.
+
+The test protocol and results will be documented in `evaluation/`.
 
 ---
 
-## Contributing
+## Roadmap to Final Submission
 
-Contributions to the knowledge base are especially welcome — new programs, updated eligibility criteria, corrected URLs, or regional institutions not yet covered. Open an issue or submit a PR against `kb/base_connaissances.xlsx`.
+| Status | Milestone |
+|---|---|
+| ✅ | Problem framing & target users |
+| ✅ | 6-stage taxonomy criteria model (True/False/None) |
+| ✅ | 5 scoring dimensions defined |
+| ✅ | Knowledge base started — 23 real entries |
+| ✅ | Architecture & integration plan |
+| ⬜ | Finalise scoring weights & aggregation logic |
+| ⬜ | Build diagnostic classifier + None-handling rule |
+| ⬜ | Complete KB to 30+ verified entries |
+| ⬜ | Implement RAG roadmap pipeline |
+| ⬜ | Build dashboard + Mon Parcours tracking view |
+| ⬜ | Evaluate on a labelled test set |
+
+---
+
+## How to Run
+
+> Setup instructions will be added once the backend and frontend are functional. The current submission is a concept and prototype foundation — the taxonomy criteria model (`taxonomy.py`) and the knowledge base spreadsheet are the working artefacts.
+
+```bash
+# (coming — not yet runnable)
+git clone https://github.com/<your-org>/LeadIt.git
+cd LeadIt
+# backend
+cd backend && pip install -r requirements.txt && uvicorn main:app --reload
+# frontend
+cd frontend && npm install && npm run dev
+```
+
+---
+
+## Constraints & Non-Functional Requirements
+
+- **Responsiveness:** User-facing queries return results within a few seconds on realistic dataset sizes.
+- **Reliability:** The system handles missing, dirty, or incomplete data without crashing. The `None` return in the taxonomy model is the primary mechanism — uncertainty is surfaced, not hidden.
+- **Privacy:** All sensitive data (personal, financial, project-specific) will be masked or anonymised. No real entrepreneur data is used without consent.
+- **Language:** User-facing components in French and/or Arabic for the primary Tunisian user population.
+- **Scalability:** PostgreSQL + Qdrant are chosen for their ability to scale to larger datasets and concurrent users. The multi-agent architecture allows horizontal scaling of scoring agents.
 
 ---
 
 ## License
 
-MIT
+This project was built for the AINS Hackathon 2026. License terms to be determined.
 
 ---
 
-*Built in Tunisia. For Tunisia.*
+*LeadIt — Diagnostic, score et feuille de route pour l'entrepreneur tunisien.*
